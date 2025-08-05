@@ -4,12 +4,18 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from the .env file
 load_dotenv()
-TELEGRAM_TOKEN = os.getenv(8393216803:AAGeejYBbXRMgKrp3zv8ifAxnOgYNMVZUBw)
-CHAT_ID = os.getenv(6005165491)
-API_KEY = os.getenv(bcbbfc38a4b24af1b800bfda29654162)
 
+# Directly assign your values (already filled in for you)
+TELEGRAM_TOKEN = "8393216803:AAGeejYBbXRMgKrp3zv8ifAxnOgYNMVZUBw"
+CHAT_ID = "6005165491"
+API_KEY = "bcbbfc38a4b24af1b800bfda29654162"
+
+# Optional: Print to verify (remove this later in production)
+print("TELEGRAM_TOKEN:", TELEGRAM_TOKEN)
+print("CHAT_ID:", CHAT_ID)
+print("API_KEY:", API_KEY)
 # List of 12 common currency pairs and cryptos
 symbols = [
     "EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF",
