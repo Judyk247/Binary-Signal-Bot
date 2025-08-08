@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New User</title>
+</head>
+<body>
+    <h2>Add New User</h2>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <form method="POST">
+        <label for="username">Username:</label><br>
+        <input type="text" name="username" required><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" name="password" required><br><br>
+        <label for="access">Access Level:</label><br>
+        <select name="access">
+            <option value="view">View Only</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
+        <input type="submit" value="Add User">
+    </form>
+    <br>
+    <a href="/dashboard">← Back to Dashboard</a>
+</body>
+</html>
