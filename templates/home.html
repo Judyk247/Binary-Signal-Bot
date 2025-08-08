@@ -1,0 +1,26 @@
+<!-- template/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trading Bot Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="post">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
