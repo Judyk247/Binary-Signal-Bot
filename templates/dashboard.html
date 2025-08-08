@@ -1,0 +1,95 @@
+<!-- templates/_dashbord.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trading Bot Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 960px;
+            margin: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .signal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .signal-table th, .signal-table td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+        }
+        .signal-table th {
+            background-color: #f0f0f0;
+        }
+        .approve-button {
+            padding: 6px 12px;
+            background-color: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .approve-button:hover {
+            background-color: #16a34a;
+        }
+        .logout {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .logout a {
+            text-decoration: none;
+            color: #ef4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logout">
+        <a href="/logout">Logout</a>
+    </div>
+    <h1>Trading Signal Dashboard</h1>
+    <table class="signal-table">
+        <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Direction</th>
+            <th>Timeframe</th>
+            <th>Approve</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for signal in signals %}
+        <tr>
+            <td>{{ signal.symbol }}</td>
+            <td>{{ signal.direction }}</td>
+            <td>{{ signal.timeframe }}</td>
+            <td>
+                <form action="/approve" method="POST">
+                    <input type="hidden" name="symbol" value="{{ signal.symbol }}">
+                    <input type="hidden" name="direction" value="{{ signal.direction }}">
+                    <input type="hidden" name="timeframe" value="{{ signal.timeframe }}">
+                    <button type="submit" class="approve-button">Send Signal</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+  </html>
