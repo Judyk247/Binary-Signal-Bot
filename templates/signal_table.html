@@ -1,0 +1,52 @@
+<!-- templates/signal_table.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Signal Dashboard</h2>
+    <p>Select a timeframe to view signals:</p>
+    <form method="GET" action="{{ url_for('dashboard') }}">
+        <select name="timeframe" onchange="this.form.submit()" class="form-select w-auto d-inline-block">
+            <option value="1min" {% if selected_timeframe == '1min' %}selected{% endif %}>1 Minute</option>
+            <option value="2min" {% if selected_timeframe == '2min' %}selected{% endif %}>2 Minute</option>
+            <option value="3min" {% if selected_timeframe == '3min' %}selected{% endif %}>3 Minute</option>
+            <option value="5min" {% if selected_timeframe == '5min' %}selected{% endif %}>5 Minute</option>
+        </select>
+    </form>
+
+    {% if signals %}
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Symbol</th>
+                <th>Direction</th>
+                <th>Timeframe</th>
+                <th>Time</th>
+                <th>Approve</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for signal in signals %}
+            <tr>
+                <td>{{ signal.symbol }}</td>
+                <td>{{ signal.direction }}</td>
+                <td>{{ signal.timeframe }}</td>
+                <td>{{ signal.time }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('approve_signal') }}">
+                        <input type="hidden" name="symbol" value="{{ signal.symbol }}">
+                        <input type="hidden" name="direction" value="{{ signal.direction }}">
+                        <input type="hidden" name="timeframe" value="{{ signal.timeframe }}">
+                        <input type="hidden" name="time" value="{{ signal.time }}">
+                        <button type="submit" class="btn btn-success btn-sm">Send to Telegram</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info mt-3">No signals available for this timeframe.</div>
+    {% endif %}
+</div>
+{% endblock %}
