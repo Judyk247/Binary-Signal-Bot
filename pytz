@@ -1,0 +1,11 @@
+from datetime import datetime
+import pytz
+
+# Get current UTC time
+utc_now = datetime.now(pytz.UTC)
+print("UTC Time:", utc_now)
+
+# Convert UTC to New York time
+ny_tz = pytz.timezone("America/New_York")
+ny_time = utc_now.astimezone(ny_tz)
+print("New York Time:", ny_time)
