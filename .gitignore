@@ -1,0 +1,52 @@
+# Sensitive files
+.env
+config.py
+bot.py
+bot/__init__.py
+
+# Templates and static assets
+templates/
+static/
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Logs and debug
+*.log
+logs/
+debug.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE/project files
+.vscode/
+.idea/
+*.swp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Other sensitive configs
+*.pem
+*.key
+*.crt
