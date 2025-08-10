@@ -27,13 +27,24 @@ class Signal(db.Model):
 
 # ========== INITIAL SETUP ==========
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin_user = User(username='admin', password=generate_password_hash('adminpass'), is_admin=True)
-        db.session.add(admin_user)
-        db.session.commit()
+first_request_done = False
+
+@app.before_request
+def init_once():
+    global first_request_done
+    if not first_request_done:
+        # Your initialization logic from before_first_request
+        try:
+            # Example: create database tables
+            db.create_all()
+
+            # Example: load your initial signals or setup tasks
+            load_signals()
+
+            print("Initialization completed successfully.")
+        except Exception as e:
+            print(f"Initialization failed: {e}")
+        first_request_done = True
 
 # ========== AUTHENTICATION ==========
 
