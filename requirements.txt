@@ -5,7 +5,7 @@ pandas==2.2.3 --only-binary :all:
 requests==2.31.0
 schedule==1.2.1
 python-telegram-bot==13.15
-ta==ta==0.10.2 --only-binary :all:
+ta==0.10.2 --only-binary :all:
 email-validator==2.1.0.post1
 heikin-ashi==0.1.0 --only-binary :all:
 pytz==2024.1
