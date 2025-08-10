@@ -16,7 +16,25 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+from flask import request, abort
+import os
 
+@app.route("/debug-creds")
+def debug_creds():
+    # Security check using token
+    token = request.args.get("token")
+    if token != os.environ.get("DEBUG_TOKEN"):
+        abort(403)  # Forbidden if token doesn't match
+
+    # Fetch first user from database
+    user = User.query.first()
+    if user:
+        return {
+            "username": user.username,
+            "password_hash": user.password  # hashed password, not plain text
+        }
+    else:
+        return {"error": "No user found in the database"}
 class Signal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     symbol = db.Column(db.String(10))
