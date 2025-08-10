@@ -35,6 +35,26 @@ def debug_creds():
         }
     else:
         return {"error": "No user found in the database"}
+        from werkzeug.security import check_password_hash
+
+@app.route("/check-password")
+def check_password():
+    token = request.args.get("token")
+    if token != os.environ.get("DEBUG_TOKEN"):
+        abort(403)
+
+    password_to_test = request.args.get("password")
+    if not password_to_test:
+        return {"error": "Please provide a password via ?password=yourpassword"}
+
+    user = User.query.first()
+    if not user:
+        return {"error": "No user found"}
+
+    if check_password_hash(user.password, password_to_test):
+        return {"match": True, "message": "Password matches stored hash"}
+    else:
+        return {"match": False, "message": "Password does NOT match stored hash"}
 class Signal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     symbol = db.Column(db.String(10))
