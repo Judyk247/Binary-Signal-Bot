@@ -55,6 +55,35 @@ def check_password():
         return {"match": True, "message": "Password matches stored hash"}
     else:
         return {"match": False, "message": "Password does NOT match stored hash"}
+        from flask import request, abort
+import os
+from werkzeug.security import generate_password_hash
+
+@app.route("/add-admin")
+def add_admin():
+    # Check token for security
+    token = request.args.get("token")
+    if token != os.environ.get("DEBUG_TOKEN"):
+        abort(403)  # Forbidden
+
+    # Get username and password from query params
+    username = request.args.get("username")
+    password = request.args.get("password")
+
+    if not username or not password:
+        return {"error": "Username and password are required"}, 400
+
+    # Check if the user already exists
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user:
+        return {"error": "User already exists"}, 400
+
+    # Create new admin user
+    new_admin = User(username=username, password=generate_password_hash(password), is_admin=True)
+    db.session.add(new_admin)
+    db.session.commit()
+
+    return {"success": f"Admin user '{username}' created successfully"}
 class Signal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     symbol = db.Column(db.String(10))
