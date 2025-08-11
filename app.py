@@ -229,7 +229,7 @@ def add_signal():
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html'), 404
-    @app.route('/favicon.ico')
+@app.route('/favicon.ico')
 def favicon():
     return '', 204  # Empty response so browser stops logging favicon errors
 
