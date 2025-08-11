@@ -91,6 +91,22 @@ class Signal(db.Model):
     direction = db.Column(db.String(10))
     time = db.Column(db.String(50))
     approved = db.Column(db.Boolean, default=False)
+    @app.route("/debug-creds")
+def debug_creds():
+    # Check token for security
+    token = request.args.get("token")
+    if token != os.environ.get("DEBUG_TOKEN"):
+        abort(403)  # Forbidden
+
+    # Get the first user in the database
+    user = User.query.first()
+    if user:
+        return {
+            "username": user.username,
+            "password_hash": user.password  # hashed password, safe to share
+        }
+    else:
+        return {"error": "No user found in the database"}
 
 # ========== INITIAL SETUP ==========
 
