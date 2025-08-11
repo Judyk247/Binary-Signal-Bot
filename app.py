@@ -9,6 +9,12 @@ app.secret_key = 'your_secret_key_here'  # You can keep this key or change it to
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Adjust this to your database URI
 db = SQLAlchemy(app)
 
+# ========== HOMEPAGE ==========
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
 # ========== DATABASE MODELS ==========
 
 class User(db.Model):
@@ -33,14 +39,9 @@ first_request_done = False
 def init_once():
     global first_request_done
     if not first_request_done:
-        # Your initialization logic from before_first_request
         try:
-            # Example: create database tables
             db.create_all()
-
-            # Example: load your initial signals or setup tasks
-            load_signals()
-
+            load_signals()  # Make sure this function exists in your project
             print("Initialization completed successfully.")
         except Exception as e:
             print(f"Initialization failed: {e}")
@@ -74,7 +75,7 @@ def add_user():
     if existing:
         flash("User already exists", "warning")
     else:
-        new_user = User(username=username, password=generate_password_hash(password), is_admin=True)  # Admin by default
+        new_user = User(username=username, password=generate_password_hash(password), is_admin=True)
         db.session.add(new_user)
         db.session.commit()
         flash(f"User '{username}' added.", "success")
