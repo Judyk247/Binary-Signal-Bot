@@ -1,95 +1,175 @@
-<!-- templates/_dashbord.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trading Bot Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Options Strategy Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f3f4f6;
+            background-color: #0e1117;
+            color: #ffffff;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
-        .container {
-            max-width: 960px;
-            margin: auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
+        header {
+            background-color: #1f2937;
+            padding: 15px;
+            text-align: center;
         }
         h1 {
-            text-align: center;
+            margin: 0;
+            color: #22d3ee;
         }
-        .signal-table {
+        .timeframe-section {
+            margin: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #1e293b;
+        }
+        h2 {
+            color: #93c5fd;
+        }
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
-        .signal-table th, .signal-table td {
-            border: 1px solid #ccc;
-            padding: 12px;
+        table, th, td {
+            border: 1px solid #334155;
+        }
+        th, td {
+            padding: 10px;
             text-align: center;
         }
-        .signal-table th {
-            background-color: #f0f0f0;
+        th {
+            background-color: #334155;
+            color: #f1f5f9;
         }
-        .approve-button {
-            padding: 6px 12px;
+        .buy {
             background-color: #22c55e;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            color: #fff;
         }
-        .approve-button:hover {
-            background-color: #16a34a;
+        .sell {
+            background-color: #ef4444;
+            color: #fff;
         }
-        .logout {
-            text-align: right;
-            margin-bottom: 10px;
-        }
-        .logout a {
-            text-decoration: none;
-            color: #ef4444;
-            font-weight: bold;
+        .neutral {
+            background-color: #64748b;
+            color: #fff;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logout">
-        <a href="/logout">Logout</a>
-    </div>
-    <h1>Trading Signal Dashboard</h1>
-    <table class="signal-table">
+
+<header>
+    <h1>Binary Options Strategy Dashboard</h1>
+    <p>Live Signals for 1m, 2m, 3m (Trend-Following) & 5m (Trend-Reversal)</p>
+</header>
+
+<section class="timeframe-section">
+    <h2>1 Minute (Trend Following)</h2>
+    <table>
         <thead>
-        <tr>
-            <th>Symbol</th>
-            <th>Direction</th>
-            <th>Timeframe</th>
-            <th>Approve</th>
-        </tr>
+            <tr>
+                <th>Pair</th>
+                <th>Signal</th>
+                <th>Strength</th>
+                <th>Timestamp</th>
+            </tr>
         </thead>
-        <tbody>
-        {% for signal in signals %}
-        <tr>
-            <td>{{ signal.symbol }}</td>
-            <td>{{ signal.direction }}</td>
-            <td>{{ signal.timeframe }}</td>
-            <td>
-                <form action="/approve" method="POST">
-                    <input type="hidden" name="symbol" value="{{ signal.symbol }}">
-                    <input type="hidden" name="direction" value="{{ signal.direction }}">
-                    <input type="hidden" name="timeframe" value="{{ signal.timeframe }}">
-                    <button type="submit" class="approve-button">Send Signal</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+        <tbody id="signals-1m">
+            <!-- JS will populate -->
         </tbody>
     </table>
-</div>
+</section>
+
+<section class="timeframe-section">
+    <h2>2 Minutes (Trend Following)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Pair</th>
+                <th>Signal</th>
+                <th>Strength</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="signals-2m">
+            <!-- JS will populate -->
+        </tbody>
+    </table>
+</section>
+
+<section class="timeframe-section">
+    <h2>3 Minutes (Trend Following)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Pair</th>
+                <th>Signal</th>
+                <th>Strength</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="signals-3m">
+            <!-- JS will populate -->
+        </tbody>
+    </table>
+</section>
+
+<section class="timeframe-section">
+    <h2>5 Minutes (Trend Reversal)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Pair</th>
+                <th>Signal</th>
+                <th>Strength</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="signals-5m">
+            <!-- JS will populate -->
+        </tbody>
+    </table>
+</section>
+
+<script>
+    async function fetchSignals() {
+        try {
+            const res = await fetch('/api/signals'); // Adjust endpoint to your backend
+            const data = await res.json();
+
+            // Clear old data
+            document.getElementById('signals-1m').innerHTML = '';
+            document.getElementById('signals-2m').innerHTML = '';
+            document.getElementById('signals-3m').innerHTML = '';
+            document.getElementById('signals-5m').innerHTML = '';
+
+            // Populate new data
+            Object.keys(data).forEach(tf => {
+                const tableBody = document.getElementById(`signals-${tf}`);
+                data[tf].forEach(signal => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${signal.pair}</td>
+                        <td class="${signal.type.toLowerCase()}">${signal.type}</td>
+                        <td>${signal.strength}</td>
+                        <td>${signal.time}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+        } catch (err) {
+            console.error('Error fetching signals:', err);
+        }
+    }
+
+    // Refresh every 5 seconds
+    setInterval(fetchSignals, 5000);
+    fetchSignals();
+</script>
+
 </body>
-  </html>
+</html>
