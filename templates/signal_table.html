@@ -1,52 +1,81 @@
-<!-- templates/signal_table.html -->
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Binary Options Signal Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .buy {
+            color: green;
+            font-weight: bold;
+        }
+        .sell {
+            color: red;
+            font-weight: bold;
+        }
+        .neutral {
+            color: #777;
+        }
+    </style>
+</head>
+<body>
 
-{% block content %}
-<div class="container mt-5">
-    <h2>Signal Dashboard</h2>
-    <p>Select a timeframe to view signals:</p>
-    <form method="GET" action="{{ url_for('dashboard') }}">
-        <select name="timeframe" onchange="this.form.submit()" class="form-select w-auto d-inline-block">
-            <option value="1min" {% if selected_timeframe == '1min' %}selected{% endif %}>1 Minute</option>
-            <option value="2min" {% if selected_timeframe == '2min' %}selected{% endif %}>2 Minute</option>
-            <option value="3min" {% if selected_timeframe == '3min' %}selected{% endif %}>3 Minute</option>
-            <option value="5min" {% if selected_timeframe == '5min' %}selected{% endif %}>5 Minute</option>
-        </select>
-    </form>
+    <h1>Binary Options Signals</h1>
 
-    {% if signals %}
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
+    <table>
+        <thead>
             <tr>
-                <th>Symbol</th>
-                <th>Direction</th>
+                <th>Currency Pair</th>
                 <th>Timeframe</th>
-                <th>Time</th>
-                <th>Approve</th>
+                <th>Signal</th>
+                <th>Timestamp (UTC)</th>
+                <th>Strategy Type</th>
             </tr>
         </thead>
         <tbody>
-            {% for signal in signals %}
+            <!-- Example Row -->
             <tr>
-                <td>{{ signal.symbol }}</td>
-                <td>{{ signal.direction }}</td>
-                <td>{{ signal.timeframe }}</td>
-                <td>{{ signal.time }}</td>
-                <td>
-                    <form method="POST" action="{{ url_for('approve_signal') }}">
-                        <input type="hidden" name="symbol" value="{{ signal.symbol }}">
-                        <input type="hidden" name="direction" value="{{ signal.direction }}">
-                        <input type="hidden" name="timeframe" value="{{ signal.timeframe }}">
-                        <input type="hidden" name="time" value="{{ signal.time }}">
-                        <button type="submit" class="btn btn-success btn-sm">Send to Telegram</button>
-                    </form>
-                </td>
+                <td>EUR/USD</td>
+                <td>1m</td>
+                <td class="buy">BUY</td>
+                <td>2025-08-13 14:25</td>
+                <td>Trend Following</td>
             </tr>
-            {% endfor %}
+            <tr>
+                <td>GBP/JPY</td>
+                <td>5m</td>
+                <td class="sell">SELL</td>
+                <td>2025-08-13 14:25</td>
+                <td>Trend Reversal</td>
+            </tr>
         </tbody>
     </table>
-    {% else %}
-    <div class="alert alert-info mt-3">No signals available for this timeframe.</div>
-    {% endif %}
-</div>
-{% endblock %}
+
+</body>
+</html>
