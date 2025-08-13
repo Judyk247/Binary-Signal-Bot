@@ -2,91 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trading Bot Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Options Strategy Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
     <style>
         body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f3f3f3;
+            background-color: #0d1117;
+            color: #f0f6fc;
         }
-        .header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 1rem;
+        header {
             text-align: center;
+            padding: 1rem;
+            border-bottom: 2px solid #30363d;
         }
-        .container {
-            padding: 2rem;
+        h1 {
+            color: #58a6ff;
+        }
+        .strategy-table {
+            margin-top: 2rem;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+        }
+        thead {
+            background: #161b22;
         }
         th, td {
             padding: 0.8rem;
-            border: 1px solid #ddd;
+            border-bottom: 1px solid #30363d;
+        }
+        .buy {
+            color: #00ff91;
+            font-weight: bold;
+        }
+        .sell {
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 2rem;
             text-align: center;
-        }
-        th {
-            background-color: #34495e;
-            color: white;
-        }
-        .approve-button {
-            padding: 0.5rem 1rem;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .approve-button:hover {
-            background-color: #2ecc71;
+            font-size: 0.8rem;
+            color: #8b949e;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Trading Bot Signal Dashboard</h1>
-    </div>
-    <div class="container">
-        <h2>Live Signals</h2>
-        {% if signals %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Symbol</th>
-                        <th>Timeframe</th>
-                        <th>Direction</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for signal in signals %}
-                    <tr>
-                        <td>{{ signal.time }}</td>
-                        <td>{{ signal.symbol }}</td>
-                        <td>{{ signal.timeframe }}</td>
-                        <td>{{ signal.direction }}</td>
-                        <td>
-                            <form action="/approve" method="POST">
-                                <input type="hidden" name="symbol" value="{{ signal.symbol }}">
-                                <input type="hidden" name="timeframe" value="{{ signal.timeframe }}">
-                                <input type="hidden" name="direction" value="{{ signal.direction }}">
-                                <input type="hidden" name="time" value="{{ signal.time }}">
-                                <button class="approve-button" type="submit">Approve</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No signals available at the moment.</p>
-        {% endif %}
-    </div>
+
+<header>
+    <h1>Binary Options Multi-Timeframe Strategy Dashboard</h1>
+    <p>Live trade alerts for 1m, 2m, 3m trend-following and 5m trend-reversal setups</p>
+</header>
+
+<main>
+    <section class="strategy-table">
+        <h3>Live Signals</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timeframe</th>
+                    <th>Currency Pair</th>
+                    <th>Signal</th>
+                    <th>Price</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="signal-data">
+                <!-- Data will be injected here dynamically -->
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<footer>
+    Binary Options Strategy Dashboard © 2025
+</footer>
+
+<script>
+    // Example: dynamically fetching signals from backend every 5 seconds
+    async function fetchSignals() {
+        try {
+            const res = await fetch('/api/signals'); // Replace with your API endpoint
+            const data = await res.json();
+
+            const tableBody = document.getElementById('signal-data');
+            tableBody.innerHTML = '';
+
+            data.forEach(signal => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${signal.timeframe}</td>
+                    <td>${signal.pair}</td>
+                    <td class="${signal.type.toLowerCase()}">${signal.type}</td>
+                    <td>${signal.price}</td>
+                    <td>${signal.timestamp}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (err) {
+            console.error('Error fetching signals:', err);
+        }
+    }
+
+    setInterval(fetchSignals, 5000);
+    fetchSignals();
+</script>
+
 </body>
-</html>
+        </html>
