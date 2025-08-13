@@ -1,41 +1,193 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Unauthorized Access</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8d7da;
-            color: #721c24;
-            text-align: center;
-            padding: 50px;
-        }
-        .container {
-            background-color: #f5c6cb;
-            padding: 30px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            text-decoration: none;
-            background-color: #721c24;
-            color: white;
-            border-radius: 4px;
-        }
-        a:hover {
-            background-color: #a94442;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>Unauthorized — Access Denied</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --card: #12131a;
+      --text: #e8eaf0;
+      --muted: #a7adbb;
+      --accent: #6ea8fe;
+      --danger: #ff6b6b;
+      --ring: rgba(110,168,254,.35);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #475569;
+        --accent: #2563eb;
+        --danger: #e11d48;
+        --ring: rgba(37,99,235,.28);
+        --shadow: 0 10px 30px rgba(2,6,23,.08);
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 800px at 100% -10%, rgba(110,168,254,.06), transparent 60%),
+                  radial-gradient(900px 600px at -10% 110%, rgba(225,29,72,.05), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: linear-gradient(180deg, color-mix(in oklab, var(--card) 90%, transparent), var(--card));
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+      position: relative;
+      overflow: clip;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: .25px;
+      color: var(--danger);
+      background: color-mix(in oklab, var(--danger) 10%, transparent);
+      border: 1px solid color-mix(in oklab, var(--danger) 35%, transparent);
+    }
+    h1 {
+      margin: 14px 0 6px;
+      font-size: clamp(26px, 3.6vw, 34px);
+      line-height: 1.2;
+      letter-spacing: .2px;
+    }
+    p { margin: 6px 0 0; color: var(--muted); }
+    .hint {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .actions {
+      margin-top: 22px;
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform .04s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+      will-change: transform;
+    }
+    .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    .btn.primary {
+      background: color-mix(in oklab, var(--accent) 18%, transparent);
+      border: 1px solid color-mix(in oklab, var(--accent) 55%, transparent);
+      color: var(--text);
+      box-shadow: 0 8px 18px var(--ring);
+    }
+    .btn.primary:hover { transform: translateY(-1px); }
+    .btn.secondary {
+      background: transparent;
+      border: 1px dashed color-mix(in oklab, var(--text) 30%, transparent);
+      color: var(--text);
+    }
+    .kv {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 12px;
+      background: color-mix(in oklab, var(--text) 6%, transparent);
+      border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 10px 16px;
+      font-size: 14px;
+    }
+    .kv div { color: var(--muted); }
+    .kv code {
+      color: var(--text);
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: color-mix(in oklab, var(--text) 8%, transparent);
+      border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+    }
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .lock {
+      width: 18px; height: 18px; flex: 0 0 18px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Unauthorized Access</h2>
-        <p>You do not have permission to view this page.</p>
-        <a href="/login">Return to Login</a>
+  <main class="card" role="region" aria-labelledby="title">
+    <span class="badge" aria-live="polite" aria-atomic="true">
+      <svg class="lock" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 10V8a5 5 0 1 1 10 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <rect x="4.5" y="10" width="15" height="10" rx="2.2" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="12" cy="15" r="1.6" fill="currentColor"/>
+      </svg>
+      401 Unauthorized
+    </span>
+
+    <h1 id="title">Access denied</h1>
+    <p>You don’t have permission to view this page. If you believe this is a mistake, try signing in with the correct account or request access from the administrator.</p>
+
+    <div class="kv" role="group" aria-label="Request details">
+      <div>Request Path</div><code id="path">/</code>
+      <div>Time (UTC)</div><code id="time">—</code>
+      <div>Request ID</div><code id="rid">—</code>
+      <div>IP (masked)</div><code id="ip">—</code>
     </div>
+
+    <div class="actions">
+      <a class="btn primary" href="/login" aria-label="Go to sign in">Sign in</a>
+      <button class="btn secondary" onclick="history.back()" aria-label="Go back to previous page">Go back</button>
+    </div>
+
+    <div class="hint">
+      Don’t have access? Contact your admin and include the request details above.
+    </div>
+
+    <div class="footer">
+      <span>Security policy: least privilege</span>
+      <span>&copy; <span id="year"></span> Your Company</span>
+    </div>
+  </main>
+
+  <script>
+    // Fill dynamic fields safely
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const path = location.pathname + (location.search ? location.search : "");
+      const rid = params.get("rid") || Math.random().toString(36).slice(2, 10).toUpperCase();
+      const ip = params.get("ip") || "***.***.***.***";
+
+      document.getElementById("path").textContent = path;
+      document.getElementById("time").textContent = new Date().toISOString().replace('T', ' ').replace('Z', ' UTC');
+      document.getElementById("rid").textContent = rid;
+      document.getElementById("ip").textContent = ip;
+      document.getElementById("year").textContent = new Date().getFullYear();
+    })();
+  </script>
 </body>
 </html>
+```0
