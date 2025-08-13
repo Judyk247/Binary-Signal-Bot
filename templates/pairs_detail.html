@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Pairs Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00ffae;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: auto;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #1f1f1f;
+        }
+        tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+        tr:hover {
+            background-color: #333333;
+        }
+        .signal-buy {
+            color: #00ffae;
+            font-weight: bold;
+        }
+        .signal-sell {
+            color: #ff4c4c;
+            font-weight: bold;
+        }
+        .signal-wait {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Currency Pairs Status</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Pair</th>
+                <th>Timeframe</th>
+                <th>Strategy Type</th>
+                <th>Signal</th>
+                <th>Last Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example row -->
+            <tr>
+                <td>EUR/USD</td>
+                <td>5m</td>
+                <td>Trend Reversal</td>
+                <td class="signal-buy">BUY</td>
+                <td>2025-08-13 14:55</td>
+            </tr>
+            <tr>
+                <td>GBP/JPY</td>
+                <td>1m</td>
+                <td>Trend Following</td>
+                <td class="signal-sell">SELL</td>
+                <td>2025-08-13 14:56</td>
+            </tr>
+            <tr>
+                <td>USD/CAD</td>
+                <td>3m</td>
+                <td>Trend Following</td>
+                <td class="signal-wait">WAIT</td>
+                <td>2025-08-13 14:57</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+                  </html>
