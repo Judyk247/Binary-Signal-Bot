@@ -1,77 +1,57 @@
-from flask import Blueprint, render_template, request, redirect, session, url_for, flash
-from config import ADMIN_USERNAME, ADMIN_PASSWORD, users, admin_email
-from telegram_bot import send_telegram_message
-import smtplib
+# webroutes.py
+from fastapi import APIRouter, Query
+from typing import Optional
+from strategy import scan_and_alert
+from data_fetcher import fetch_market_data
+import asyncio
 
-routes = Blueprint("routes", __name__)
+router = APIRouter()
 
-@routes.route("/", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
-            session["user"] = username
-            flash("Admin logged in successfully!", "success")
-            return redirect(url_for("routes.dashboard"))
-        elif username in users and users[username] == password:
-            session["user"] = username
-            flash("Logged in successfully!", "success")
-            return redirect(url_for("routes.dashboard"))
-        else:
-            flash("Invalid credentials", "danger")
-    return render_template("login.html")
+# Root health check
+@router.get("/")
+async def root():
+    return {"status": "ok", "message": "Binary Options Strategy API is running"}
 
-@routes.route("/dashboard")
-def dashboard():
-    if "user" not in session:
-        return redirect(url_for("routes.login"))
-    return render_template("dashboard.html")
-
-@routes.route("/logout")
-def logout():
-    session.pop("user", None)
-    flash("Logged out successfully!", "success")
-    return redirect(url_for("routes.login"))
-
-@routes.route("/send_signal", methods=["POST"])
-def send_signal():
-    if "user" not in session:
-        return redirect(url_for("routes.login"))
-    
-    symbol = request.form["symbol"]
-    direction = request.form["direction"]
-    timeframe = request.form["timeframe"]
-    message = f"✅ Signal Approved ✅\nSymbol: {symbol}\nDirection: {direction}\nTimeframe: {timeframe}"
-    send_telegram_message(message)
-    flash("Signal sent to Telegram!", "success")
-    return redirect(url_for("routes.dashboard"))
-
-@routes.route("/admin/add_user", methods=["POST"])
-def add_user():
-    if "user" not in session or session["user"] != ADMIN_USERNAME:
-        flash("Admin access only", "danger")
-        return redirect(url_for("routes.dashboard"))
-    
-    new_username = request.form["new_username"]
-    new_password = request.form["new_password"]
-    if new_username in users:
-        flash("User already exists", "warning")
+# Manual trigger for strategy scan
+@router.get("/scan")
+async def run_scan(
+    timeframe: str = Query(..., regex="^(1m|2m|3m|5m)$", description="Timeframe to scan"),
+    pair: Optional[str] = Query(None, description="Optional currency pair (e.g., EURUSD)")
+):
+    """
+    Run the scan_and_alert function manually.
+    If 'pair' is provided, only that pair will be scanned.
+    """
+    if pair:
+        pairs = [pair]
     else:
-        users[new_username] = new_password
-        flash(f"User {new_username} added successfully!", "success")
-    return redirect(url_for("routes.dashboard"))
+        # Your 50-pair setup
+        pairs = [
+            "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD",
+            "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "CHFJPY",
+            "EURAUD", "GBPAUD", "AUDCAD", "AUDCHF", "AUDNZD", "CADCHF",
+            "CADJPY", "EURNZD", "GBPCAD", "GBPNZD", "NZDCAD", "NZDCHF",
+            "NZDJPY", "USDHKD", "USDSEK", "USDNOK", "USDZAR", "USDTRY",
+            "EURSEK", "EURNOK", "EURTRY", "EURZAR", "GBPSEK", "GBPNOK",
+            "GBPTRY", "GBPZAR", "AUDSGD", "AUDHKD", "CADSGD", "CHFSGD",
+            "EURSGD", "GBPSGD", "NZDSGD", "USDINR", "USDSGD", "USDTHB",
+            "USDMXN", "USDPLN"
+        ]
 
-@routes.route("/admin/remove_user", methods=["POST"])
-def remove_user():
-    if "user" not in session or session["user"] != ADMIN_USERNAME:
-        flash("Admin access only", "danger")
-        return redirect(url_for("routes.dashboard"))
-    
-    remove_username = request.form["remove_username"]
-    if remove_username in users:
-        del users[remove_username]
-        flash(f"User {remove_username} removed successfully!", "success")
+    market_data = await fetch_market_data(pairs, timeframe)
+    alerts = scan_and_alert(market_data, timeframe)
+    return {"timeframe": timeframe, "alerts": alerts}
+
+
+# Endpoint to fetch raw market data
+@router.get("/market-data")
+async def get_market_data(
+    timeframe: str = Query(..., regex="^(1m|2m|3m|5m)$"),
+    pair: Optional[str] = None
+):
+    if pair:
+        pairs = [pair]
     else:
-        flash("User not found", "warning")
-    return redirect(url_for("routes.dashboard"))
+        pairs = ["EURUSD", "GBPUSD", "USDJPY"]  # Trimmed for speed
+    data = await fetch_market_data(pairs, timeframe)
+    return data
