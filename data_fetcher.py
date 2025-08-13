@@ -1,82 +1,84 @@
 # data_fetcher.py
+
 import os
-import time
+import requests
 import pandas as pd
-from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from strategy import check_trade_signal
-from telegram_utils import send_telegram_message
-import ccxt  # You can replace with broker-specific API wrapper
 
-# Load environment variables
+# Load credentials from .env
 load_dotenv()
-API_KEY = os.getenv("API_KEY")
-API_SECRET = os.getenv("API_SECRET")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TWELVE_DATA_API_KEY = os.getenv("TWELVE_DATA_API_KEY")
 
-# Timeframes to monitor
-TIMEFRAMES = {
-    "1m": "trend_following",
-    "2m": "trend_following",
-    "3m": "trend_following",
-    "5m": "trend_reversal"
-}
-
-# 50 currency pairs
+# List of 50 currency pairs
 CURRENCY_PAIRS = [
-    "EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "USD/CHF",
-    "NZD/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "AUD/JPY", "CAD/JPY",
-    "CHF/JPY", "NZD/JPY", "EUR/AUD", "EUR/CAD", "EUR/CHF", "EUR/NZD",
-    "GBP/AUD", "GBP/CAD", "GBP/CHF", "GBP/NZD", "AUD/CAD", "AUD/CHF",
-    "AUD/NZD", "CAD/CHF", "NZD/CAD", "NZD/CHF", "USD/SGD", "EUR/SGD",
-    "GBP/SGD", "AUD/SGD", "NZD/SGD", "USD/HKD", "USD/SEK", "USD/NOK",
-    "USD/DKK", "USD/ZAR", "USD/TRY", "USD/MXN", "EUR/SEK", "EUR/NOK",
-    "EUR/DKK", "EUR/TRY", "EUR/ZAR", "GBP/SEK", "GBP/NOK", "GBP/TRY",
-    "GBP/ZAR", "AUD/TRY"
+    "EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "USD/CHF", "NZD/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY",
+    "AUD/JPY", "CAD/JPY", "CHF/JPY", "NZD/JPY", "EUR/AUD", "GBP/AUD", "AUD/NZD", "AUD/CAD", "AUD/CHF", "CAD/CHF",
+    "EUR/CAD", "EUR/CHF", "GBP/CAD", "GBP/CHF", "NZD/CAD", "NZD/CHF", "EUR/NZD", "GBP/NZD", "USD/CNH", "USD/SGD",
+    "USD/HKD", "USD/TRY", "USD/ZAR", "EUR/TRY", "GBP/TRY", "AUD/SGD", "NZD/SGD", "CAD/SGD", "CHF/SGD", "EUR/SGD",
+    "GBP/SGD", "AUD/HKD", "NZD/HKD", "CAD/HKD", "CHF/HKD", "EUR/HKD", "GBP/HKD", "AUD/TRY", "NZD/TRY", "CAD/TRY"
 ]
 
-# Initialize exchange (demo with CCXT)
-exchange = ccxt.binance({
-    "apiKey": API_KEY,
-    "secret": API_SECRET
-})
+# Map timeframes to Twelve Data format
+TIMEFRAME_MAP = {
+    "1m": "1min",
+    "2m": "2min",
+    "3m": "3min",
+    "5m": "5min"
+}
 
-def fetch_ohlc(pair, timeframe, limit=100):
-    """Fetch OHLCV data for a given pair and timeframe."""
+def fetch_data(symbol, timeframe, output_size=100):
+    """
+    Fetch OHLCV data for a given symbol and timeframe.
+    """
+    if timeframe not in TIMEFRAME_MAP:
+        raise ValueError(f"Invalid timeframe: {timeframe}")
+
+    url = f"https://api.twelvedata.com/time_series"
+    params = {
+        "symbol": symbol,
+        "interval": TIMEFRAME_MAP[timeframe],
+        "apikey": TWELVE_DATA_API_KEY,
+        "outputsize": output_size
+    }
+
     try:
-        symbol = pair.replace("/", "")
-        ohlc = exchange.fetch_ohlcv(pair, timeframe, limit=limit)
-        df = pd.DataFrame(ohlc, columns=["timestamp", "open", "high", "low", "close", "volume"])
-        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+        response = requests.get(url, params=params)
+        data = response.json()
+
+        if "values" not in data:
+            print(f"Error fetching data for {symbol} ({timeframe}): {data}")
+            return None
+
+        df = pd.DataFrame(data["values"])
+        df["datetime"] = pd.to_datetime(df["datetime"])
+        df = df.astype({
+            "open": float,
+            "high": float,
+            "low": float,
+            "close": float,
+            "volume": float
+        })
+        df = df.sort_values(by="datetime").reset_index(drop=True)
         return df
+
     except Exception as e:
-        print(f"[ERROR] Failed to fetch data for {pair} ({timeframe}): {e}")
+        print(f"Error fetching data for {symbol} ({timeframe}): {e}")
         return None
 
-def scan_and_alert():
-    """Check all pairs and timeframes, send alert 30s before candle close."""
-    while True:
-        now = datetime.utcnow()
-        seconds_to_next_candle = 60 - (now.second % 60)
-
-        # Only scan 30 seconds before the candle closes
-        if seconds_to_next_candle == 30:
-            for pair in CURRENCY_PAIRS:
-                for tf, strategy_type in TIMEFRAMES.items():
-                    df = fetch_ohlc(pair, tf, limit=100)
-                    if df is None or len(df) < 50:
-                        continue
-
-                    # Check trade signal from strategy.py
-                    signal = check_trade_signal(df, strategy_type)
-
-                    if signal:
-                        msg = f"📊 {pair} | {tf} | {strategy_type.upper()} | {signal}"
-                        send_telegram_message(TELEGRAM_CHAT_ID, msg)
-                        print(f"[ALERT] {msg}")
-
-        time.sleep(1)  # Keep loop responsive
+def fetch_all_pairs(timeframes=["1m", "2m", "3m", "5m"]):
+    """
+    Fetch data for all currency pairs and given timeframes.
+    Returns a dict: {(symbol, timeframe): DataFrame}
+    """
+    market_data = {}
+    for pair in CURRENCY_PAIRS:
+        for tf in timeframes:
+            df = fetch_data(pair, tf)
+            if df is not None:
+                market_data[(pair, tf)] = df
+    return market_data
 
 if __name__ == "__main__":
-    print("[INFO] Starting Data Fetcher...")
-    scan_and_alert()
+    # Example: Fetch all data for testing
+    data = fetch_all_pairs()
+    print(f"Fetched data for {len(data)} pair-timeframe combinations.")
