@@ -1,26 +1,132 @@
-<!-- template/home.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Trading Bot Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Binary Options Strategy Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: none;
+            border-radius: 10px;
+        }
+        .signal-buy {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        .signal-sell {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        .signal-wait {
+            color: #cccccc;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-        <form method="post">
-            <label for="username">Username:</label>
-            <input type="text" name="username" id="username" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required>
-            
-            <button type="submit">Login</button>
-        </form>
+<div class="container py-4">
+    <h1 class="text-center mb-4">📊 Binary Options Strategy Dashboard</h1>
+
+    <div class="row g-4">
+        <!-- Trend Following Section -->
+        <div class="col-lg-6">
+            <div class="card p-3">
+                <h4>Trend Following Signals (1m / 2m / 3m)</h4>
+                <table class="table table-dark table-striped table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th>Pair</th>
+                            <th>Timeframe</th>
+                            <th>Signal</th>
+                            <th>Last Update</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trend-following-body">
+                        <!-- JS will insert signals here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Trend Reversal Section -->
+        <div class="col-lg-6">
+            <div class="card p-3">
+                <h4>Trend Reversal Signals (5m)</h4>
+                <table class="table table-dark table-striped table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th>Pair</th>
+                            <th>Timeframe</th>
+                            <th>Signal</th>
+                            <th>Last Update</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trend-reversal-body">
+                        <!-- JS will insert signals here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    <!-- Telegram Alerts Status -->
+    <div class="mt-4">
+        <div class="card p-3">
+            <h4>Telegram Alerts Status</h4>
+            <p id="telegram-status">Connecting...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchSignals() {
+        try {
+            const res = await fetch('/api/signals');
+            const data = await res.json();
+
+            const tfBody = document.getElementById('trend-following-body');
+            const trBody = document.getElementById('trend-reversal-body');
+
+            tfBody.innerHTML = '';
+            trBody.innerHTML = '';
+
+            data.trend_following.forEach(sig => {
+                tfBody.innerHTML += `
+                    <tr>
+                        <td>${sig.pair}</td>
+                        <td>${sig.timeframe}</td>
+                        <td class="signal-${sig.signal.toLowerCase()}">${sig.signal}</td>
+                        <td>${sig.timestamp}</td>
+                    </tr>
+                `;
+            });
+
+            data.trend_reversal.forEach(sig => {
+                trBody.innerHTML += `
+                    <tr>
+                        <td>${sig.pair}</td>
+                        <td>${sig.timeframe}</td>
+                        <td class="signal-${sig.signal.toLowerCase()}">${sig.signal}</td>
+                        <td>${sig.timestamp}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('telegram-status').textContent = data.telegram_status;
+        } catch (err) {
+            console.error(err);
+            document.getElementById('telegram-status').textContent = "Error fetching data";
+        }
+    }
+
+    setInterval(fetchSignals, 5000); // Refresh every 5 seconds
+    fetchSignals();
+</script>
 </body>
 </html>
