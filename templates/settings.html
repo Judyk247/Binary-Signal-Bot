@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Settings</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f6f9; }
+        .container { max-width: 900px; margin-top: 30px; }
+        .card { border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        .form-label { font-weight: 500; }
+        .section-title { font-size: 1.3rem; font-weight: 600; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="mb-4 text-center">Trading Bot Settings</h2>
+
+    <form method="POST" action="/save-settings">
+        <!-- Strategy Settings -->
+        <div class="card p-4 mb-4">
+            <h4 class="section-title">📊 Strategy Settings</h4>
+
+            <div class="mb-3">
+                <label class="form-label">Select Active Timeframes</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="timeframes" value="1m"> 1 Minute
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="timeframes" value="2m"> 2 Minutes
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="timeframes" value="3m"> 3 Minutes
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="timeframes" value="5m"> 5 Minutes (Trend Reversal)
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">ATR Volatility Threshold</label>
+                <input type="number" step="0.01" class="form-control" name="atr_threshold" value="0.5">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Stochastic Overbought Level</label>
+                <input type="number" class="form-control" name="stoch_overbought" value="80">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Stochastic Oversold Level</label>
+                <input type="number" class="form-control" name="stoch_oversold" value="20">
+            </div>
+        </div>
+
+        <!-- Currency Pairs -->
+        <div class="card p-4 mb-4">
+            <h4 class="section-title">💱 Currency Pairs</h4>
+            <div class="mb-3">
+                <label class="form-label">Select Pairs to Monitor</label>
+                <textarea class="form-control" name="currency_pairs" rows="3">EURUSD, GBPUSD, USDJPY, AUDUSD, USDCHF, USDCAD, NZDUSD</textarea>
+                <small class="text-muted">Separate with commas</small>
+            </div>
+        </div>
+
+        <!-- Telegram Alerts -->
+        <div class="card p-4 mb-4">
+            <h4 class="section-title">📩 Telegram Alerts</h4>
+
+            <div class="mb-3">
+                <label class="form-label">Telegram Bot Token</label>
+                <input type="password" class="form-control" name="telegram_token">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Telegram Chat ID</label>
+                <input type="text" class="form-control" name="telegram_chat_id">
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" name="enable_telegram" checked>
+                <label class="form-check-label">Enable Telegram Alerts</label>
+            </div>
+        </div>
+
+        <!-- Risk Management -->
+        <div class="card p-4 mb-4">
+            <h4 class="section-title">⚖️ Risk Management</h4>
+            <div class="mb-3">
+                <label class="form-label">Max Trades Per Session</label>
+                <input type="number" class="form-control" name="max_trades" value="5">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Stop Loss (Loss Count)</label>
+                <input type="number" class="form-control" name="stop_loss" value="3">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">💾 Save Settings</button>
+    </form>
+</div>
+
+</body>
+  </html>
